@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import net.enjoy.springboot.registrationlogin.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -14,8 +15,8 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY =
-            "your-256-bit-secret-key-your-256-bit-secret-key";
+    @Value("${jwt.secret-key}")
+    private String secretKey;
 
     public String generateToken(User user) {
 
@@ -28,7 +29,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()),
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()),
                         SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -45,7 +46,7 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
+                .setSigningKey(secretKey.getBytes())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
