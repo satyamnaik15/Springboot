@@ -476,13 +476,27 @@
     let currentUser = null;
     let sending = false;
 
-    // Auto-login if token saved
+    // Decode JWT payload and check expiry
+    function isTokenExpired(token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 < Date.now();
+      } catch {
+        return true;
+      }
+    }
+
+    // Auto-login if token saved and not expired
     const saved = localStorage.getItem('jwt_token');
     const savedUser = localStorage.getItem('jwt_username');
-    if (saved && savedUser) {
+    if (saved && savedUser && !isTokenExpired(saved)) {
       jwtToken = saved;
       currentUser = savedUser;
       showChat();
+    } else if (saved) {
+      // Clear stale/expired token
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('jwt_username');
     }
 
     // ── Auth ──
@@ -654,6 +668,12 @@
       const message = input.value.trim();
       if (!message) return;
 
+      // Check token expiry before sending
+      if (!jwtToken || isTokenExpired(jwtToken)) {
+        logout();
+        return;
+      }
+
       input.value = '';
       input.style.height = 'auto';
       sending = true;
@@ -675,7 +695,13 @@
         setTyping(false);
 
         if (res.status === 401 || res.status === 403) {
-          appendMessage('Your session expired. Please log out and log back in.', 'ai');
+          // Token rejected by server — force re-login
+          logout();
+          return;
+        }
+
+        if (!res.ok) {
+          appendMessage('Server error (' + res.status + '). Try again.', 'ai');
           return;
         }
 
