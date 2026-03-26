@@ -30,8 +30,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**", "/", "/index.html", "/*.css", "/*.js", "/**.html").permitAll()
-                                .requestMatchers("/api/chat/**").authenticated()
+                        auth.requestMatchers("/api/auth/**", "/", "/index.html", "/*.css", "/*.js").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
