@@ -476,6 +476,20 @@
     let currentUser = null;
     let sending = false;
 
+    const nextHints = [
+      "Hit me again... I'm just getting warmed up 🔥",
+      "Come on, say something dumber this time 😏",
+      "Still here? Type something, coward 💀",
+      "Ready for round 2? 🥊",
+      "Go ahead, embarrass yourself again...",
+      "Type your next L here 👇",
+      "What else you got? 🤡",
+      "Try harder next time... seriously 😂",
+      "Another one? You never learn, do you? 😈",
+      "Your next roast is one message away 🎤",
+    ];
+    let hintIndex = 0;
+
     // Decode JWT payload and check expiry
     function isTokenExpired(token) {
       try {
@@ -708,6 +722,9 @@
         const data = await res.json();
         if (data?.reply) {
           appendMessage(data.reply, 'ai');
+          const input = document.getElementById('chat-input');
+          input.placeholder = nextHints[hintIndex % nextHints.length];
+          hintIndex++;
         } else {
           appendMessage('Something went wrong. The AI is probably too embarrassed to reply.', 'ai');
         }
