@@ -18,7 +18,7 @@ public class OllamaService {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaService.class);
 
-    private static final String SYSTEM_PROMPT =
+    private static final String TRASH_PROMPT =
             "You are the ultimate trash-talker and sarcasm machine. " +
             "Every message you receive must be roasted with maximum sarcasm, witty insults, and savage trash talk. " +
             "Be brutally funny, over-the-top, and never be kind or helpful. " +
@@ -35,12 +35,13 @@ public class OllamaService {
     @SuppressWarnings("unchecked")
     public String getTrashTalkReply(String userMessage) {
         String url = ollamaBaseUrl + "/api/chat";
+        String systemPrompt = TRASH_PROMPT;
 
         Map<String, Object> body = Map.of(
                 "model", model,
                 "stream", false,
                 "messages", List.of(
-                        Map.of("role", "system", "content", SYSTEM_PROMPT),
+                        Map.of("role", "system", "content", systemPrompt),
                         Map.of("role", "user", "content", userMessage)
                 )
         );
